@@ -159,7 +159,7 @@ public class Player {
 		
 		System.out.println("\nYour winning chances for the next question are:"+q.getWinChances()*100+"% you will win "+q.getReward()+"$");
 		
-		System.out.println("Would you like to continue playing? type y/n");
+		System.out.println("If you want to quit please enter n , press enter to proceed...");
 
 		String playerAnswer = input2.nextLine();
 		if (playerAnswer.equals("n")) {
