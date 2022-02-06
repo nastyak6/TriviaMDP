@@ -17,7 +17,10 @@ public class Player {
 	int currentLevel = 1;
 	int sumRewards = 0;
 	boolean continuePlay = true;
-
+	Question [] states = {new Level1(),new Level2(),new Level3(),new Level4(),new Level5(),new Level6(),new Level7(),new Level8(),null};
+	double [] ValItaration = new double [states.length];
+	String [] policy = new String[states.length];
+	
 	Scanner input = new Scanner(System.in);
 
 	void TriviaGame() {
@@ -142,41 +145,60 @@ public class Player {
 		sumRewards += q.getReward();
 		System.out.println("You are correct :)");
 		System.out.println("You have won " + q.getReward() + " and have a total of " + sumRewards);
-
+		if(q.getLevel()==8) {
+			System.out.println("congratulations! you won the game!");
+			System.exit(0);
+		}
 	}
 
 	void continuePlay(Question q) {
 		Scanner input2 = new Scanner(System.in);
-
-		double winChances=q.getWinChances()*(q.getReward()+sumRewards)*0.25;
-		double loseChances=(1-q.getWinChances())*sumRewards*0.75;
-		System.out.println("win chances:"+winChances+" lose chances:" +loseChances);
-		
-		if(winChances>loseChances)
-			System.out.println("The machine recommends to proceed");
-		else
-			System.out.println("The machine recommends to quit");
-		
-		System.out.println("\nYour winning chances for the next question are:"+q.getWinChances()*100+"% you will win "+q.getReward()+"$");
-		
-		System.out.println("If you want to quit please enter n , press enter to proceed...");
-
+		System.out.println("The machine recommends to : "+ policy[q.getLevel()-1]);
+		System.out.println("If you want to quit please enter n , or enter to proceed...");
 		String playerAnswer = input2.nextLine();
 		if (playerAnswer.equals("n")) {
 			continuePlay = false;
 			System.out.println("Thank you for palying, you have won " + sumRewards);
 			System.exit(0);
 		}
-		
-		
 	}
-
+	
 	void PlayerAnsweredWrong() {
 		sumRewards = 0;
 		System.out.println("You are wrong :(");
 		System.out.println("You have lost all of your reward");
 		System.out.println("See you next time");
 		continuePlay = false;
+	}
+	
+	void MDP () {
+		for(int i=0;i<10;i++) {
+			double [] temp = new double [states.length]; // Vk+1
+			for (Question s : states) {//every level is a state
+				if(s==null)
+					temp[8]=0;//last level -> game over can't get more points after this level
+				else {
+					for ( String action : s.getAction()) {
+						double sum1=0,sum2=0;
+						if(action.equals("Quit"))//game over
+							sum1+=1*(s.getSReward()+1*ValItaration[8]);//gamma is 1
+						else {//play
+							sum2+=s.getWinChances()*(s.getReward()+1*ValItaration[s.getLevel()]);//right answer
+							sum2+=(1-s.getWinChances())*(-s.getSReward()+1*ValItaration[8]);//wrong answer
+						}
+						if(sum1>sum2 && sum1>temp[s.getLevel()-1]) {
+							temp[s.getLevel()-1]=sum1;
+							policy[s.getLevel()-1]="Quit";
+						}
+						else if(sum2>sum1 && sum2>temp[s.getLevel()-1]) {
+							temp[s.getLevel()-1]=sum2;
+							policy[s.getLevel()-1]="Play";
+						}
+					}
+				}
+			}
+			ValItaration=temp;
+		}
 	}
 
 }

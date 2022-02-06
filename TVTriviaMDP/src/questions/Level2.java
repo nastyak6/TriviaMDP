@@ -4,6 +4,7 @@ public class Level2 extends Question{
 	
 	public Level2() {
 		super(2,0.9,5);
+		sReward=1;
 	}
 
 	

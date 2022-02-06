@@ -4,6 +4,7 @@ public class Level3 extends Question{
 
 	public Level3() {
 		super(3,0.8,10);
+		sReward=6;
 	}
 
 	

@@ -4,6 +4,7 @@ public class Level1 extends Question{
 
 	public Level1() {
 		super(1,0.99,1);
+		sReward=0;
 	}
 	
 	public static int Q1L1() {

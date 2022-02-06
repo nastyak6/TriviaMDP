@@ -3,6 +3,7 @@ package questions;
 public class Level8 extends Question{
 	public Level8() {
 		super(8,0.3,5000);
+		sReward=1666;
 	}
 
 	

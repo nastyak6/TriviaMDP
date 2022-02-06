@@ -6,7 +6,8 @@ public class Question{
 	int level;
 	double winChances;
 	int reward;
-	
+	String [] action = {"Play","Quit"};
+	protected int sReward;
 
 //constructor
 	public Question(int level, double winChances, int reward) {
@@ -45,6 +46,11 @@ public class Question{
 		this.reward = reward;
 	}
 	
-
+	public String[] getAction() {
+		return this.action;
+	}
 	
+	public int getSReward() {
+		return this.sReward;
+	}
 }
