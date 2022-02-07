@@ -18,8 +18,8 @@ public class Player {
 	int sumRewards = 0;
 	boolean continuePlay = true;
 	Question [] states = {new Level1(),new Level2(),new Level3(),new Level4(),new Level5(),new Level6(),new Level7(),new Level8(),null};
-	double [] ValItaration = new double [states.length];
-	String [] policy = new String[states.length];
+	double [] ValItaration = new double [states.length];//for MDP calculations in iterations
+	String [] policy = new String[states.length];//for saving machine policy for each state: {Quit,Play}
 	
 	Scanner input = new Scanner(System.in);
 
@@ -144,7 +144,7 @@ public class Player {
 	void PlayerAnsweredCorrect(Question q) {
 		sumRewards += q.getReward();
 		System.out.println("You are correct :)");
-		System.out.println("You have won " + q.getReward() + " and have a total of " + sumRewards);
+		System.out.println("You have won " + q.getReward() + "$ and have a total of " + sumRewards+ "$");
 		if(q.getLevel()==8) {
 			System.out.println("congratulations! you won the game!");
 			System.exit(0);
@@ -153,12 +153,12 @@ public class Player {
 
 	void continuePlay(Question q) {
 		Scanner input2 = new Scanner(System.in);
-		System.out.println("The machine recommends to : "+ policy[q.getLevel()-1]);
+		System.out.println("The machine recommends to : "+ policy[q.getLevel()-1]);//machine recommendation of policy print
 		System.out.println("If you want to quit please enter n , or enter to proceed...");
 		String playerAnswer = input2.nextLine();
 		if (playerAnswer.equals("n")) {
 			continuePlay = false;
-			System.out.println("Thank you for palying, you have won " + sumRewards);
+			System.out.println("Thank you for palying, you have won " + sumRewards + "$");
 			System.exit(0);
 		}
 	}
@@ -172,6 +172,7 @@ public class Player {
 	}
 	
 	void MDP () {
+		//number of iterations are 10 because we noticed that after 10 iterations the numbers don't change as much
 		for(int i=0;i<10;i++) {
 			double [] temp = new double [states.length]; // Vk+1
 			for (Question s : states) {//every level is a state
@@ -180,24 +181,29 @@ public class Player {
 				else {
 					for ( String action : s.getAction()) {
 						double sum1=0,sum2=0;
+						//sum for quitting
 						if(action.equals("Quit"))//game over
 							sum1+=1*(s.getSReward()+1*ValItaration[8]);//gamma is 1
-						else {//play
-							sum2+=s.getWinChances()*(s.getReward()+1*ValItaration[s.getLevel()]);//right answer
-							sum2+=(1-s.getWinChances())*(-s.getSReward()+1*ValItaration[8]);//wrong answer
+						else {//sum for continuing to play next level
+							//right answer for next level
+							sum2+=s.getWinChances()*(s.getReward()+1*ValItaration[s.getLevel()]);
+							//wrong answer for next level
+							sum2+=(1-s.getWinChances())*(-s.getSReward()+1*ValItaration[8]);
 						}
-						if(sum1>sum2 && sum1>temp[s.getLevel()-1]) {
+						//if sum of quitting is bigger than sum of playing next level
+						if(sum1>sum2 && sum1>temp[s.getLevel()-1]) { 
 							temp[s.getLevel()-1]=sum1;
-							policy[s.getLevel()-1]="Quit";
+							policy[s.getLevel()-1]="Quit"; //machine will suggest to quit
 						}
+						//if sum of playing next level is bigger than sum of quitting
 						else if(sum2>sum1 && sum2>temp[s.getLevel()-1]) {
 							temp[s.getLevel()-1]=sum2;
-							policy[s.getLevel()-1]="Play";
+							policy[s.getLevel()-1]="Play"; //machine will suggest to continue playing
 						}
 					}
 				}
 			}
-			ValItaration=temp;
+			ValItaration=temp;//saving all sums up until now into ValItaration 
 		}
 	}
 
